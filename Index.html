@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <!-- <?!= include('Stylesheet') ?> -->
+    <style>
+      thead{
+        background-color: black;
+      }
+      th{
+        text-align: center;
+        color: ghostwhite;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Check-In Data</h1>
+    <button onclick="fetchData()">Fetch Data</button>
+    <div id="data-container">No Data Loaded</div>
+    <!-- <?!= include('JavaScript') ?> -->
+    <script>
+      window.addEventListener('load', function() {
+          console.log('Page is loaded');
+      });
+  
+      function fetchData() {
+          google.script.run
+              .withSuccessHandler(displayData)
+              .withFailureHandler(showError)
+              .getLiveData();
+      }
+  
+      // Display the fetched data in the HTML container
+      function displayData(data) {
+      const container = document.getElementById('data-container');
+  
+      try {
+          const parsedData = JSON.parse(data); // Parse the JSON string
+  
+          if (!parsedData || parsedData.length === 0) {
+          container.innerHTML = "No data available.";
+          return;
+          }
+          // Create a table to display the parsed data
+          let html = '<div"><table border="1" style="width: 100%; text-align: left;">';
+          parsedData.forEach((row, i) => {
+          if(i==0){
+              html += '<thead><tr>';
+              row.forEach(cell => html += `<th>${cell}</th>`);
+              html += '</tr></thead><tbody>';
+          }else{
+              html += '<tr>';
+              row.forEach(cell => html += `<td>${cell}</td>`);
+              html += '</tr>';
+          }
+          });
+          html += '</tbody></table></div>';
+  
+          container.innerHTML = html;
+      } catch (error) {
+          container.innerHTML = `Error parsing data: ${error.message}`;
+      }
+      }
+  
+      function showError(error) {
+          const container = document.getElementById('data-container');
+          container.innerHTML = `Error fetching data: ${error.message}`;
+      }
+    </script>
+  </body>
+</html>
